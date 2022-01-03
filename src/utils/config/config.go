@@ -32,7 +32,7 @@ func LoadEnv() {
 
 	PROJECT_ID = os.Getenv("PROJECT_ID")
 
-	SERVICE_ACCOUNT, err = ioutil.ReadFile("./src/utils/config/credentials/serviceAccount.json")
+	SERVICE_ACCOUNT, err = ioutil.ReadFile("./.credentials/serviceAccount.json")
 	if err != nil {
 		log.Fatal("Failed to parse config file")
 	}
