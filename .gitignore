@@ -1,0 +1,4 @@
+.env
+src/utils/config/credentials/*
+
+!src/utils/config/credentials/.gitkeep
