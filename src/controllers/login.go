@@ -2,12 +2,14 @@ package controllers
 
 import (
 	"api/src/database"
+	"api/src/middlewares/authentication"
 	"api/src/models"
 	"api/src/providers/hash_provider"
 	"api/src/repositories"
 	"api/src/utils/response"
 	"encoding/json"
 	"errors"
+	"fmt"
 	"io/ioutil"
 	"net/http"
 )
@@ -40,4 +42,7 @@ func Login(writer http.ResponseWriter, request *http.Request) {
 		response.Error(writer, http.StatusUnauthorized, customErr)
 		return
 	}
+
+	token, _ := authentication.GenerateToken(databaseUser.Id)
+	fmt.Println(token)
 }
