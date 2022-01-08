@@ -1,8 +1,7 @@
 package config
 
 import (
-	"fmt"
-	"io/ioutil"
+	"api/src/utils"
 	"log"
 	"os"
 	"strconv"
@@ -10,11 +9,17 @@ import (
 	"github.com/joho/godotenv"
 )
 
+type database struct {
+	User         string `json:"db_user,omitempty"`
+	Password     string `json:"db_password,omitempty"`
+	Host         string `json:"db_host,omitempty"`
+	Name         string `json:"db_name,omitempty"`
+	InstanceName string `json:"instance_name,omitempty"`
+}
+
 var (
-	DATABASE_URL    = ""
-	PORT            = 0
-	PROJECT_ID      = ""
-	SERVICE_ACCOUNT []byte
+	DATABASE database
+	PORT     = 0
 )
 
 // LoadEnv loads the environment variables
@@ -30,16 +35,5 @@ func LoadEnv() {
 		PORT = 3000
 	}
 
-	PROJECT_ID = os.Getenv("PROJECT_ID")
-
-	SERVICE_ACCOUNT, err = ioutil.ReadFile("./.credentials/serviceAccount.json")
-	if err != nil {
-		log.Fatal("Failed to parse config file")
-	}
-
-	DATABASE_URL = fmt.Sprintf("%s:%s@/%s?charset=utf8&parseTime=True&loc=Local",
-		os.Getenv("DB_USER"),
-		os.Getenv("DB_PASSWORD"),
-		os.Getenv("DB_NAME"),
-	)
+	utils.ParseJSONFile("./.credentials/database.json", &DATABASE)
 }
