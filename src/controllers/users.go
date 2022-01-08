@@ -1,34 +1,41 @@
 package controllers
 
 import (
+	"api/src/database"
 	"api/src/models"
 	"api/src/repositories"
 	"api/src/utils/response"
 	"encoding/json"
 	"io/ioutil"
 	"net/http"
+	"strconv"
 	"strings"
 
 	"github.com/gorilla/mux"
 )
 
-func CreateUser(writer http.ResponseWriter, request *http.Request) {
-	requestBody, err := ioutil.ReadAll(request.Body)
+func Create(writer http.ResponseWriter, request *http.Request) {
+	body, err := ioutil.ReadAll(request.Body)
 	if err != nil {
 		response.Error(writer, http.StatusUnprocessableEntity, err)
 	}
 
 	var user models.User
-	if err = json.Unmarshal(requestBody, &user); err != nil {
+	if err = json.Unmarshal(body, &user); err != nil {
 		response.Error(writer, http.StatusInternalServerError, err)
 		return
 	}
 
-	repository := repositories.NewUserRepository()
-
-	err = repository.CreateUser(user)
-	if err != nil {
+	if err = user.Validate("register"); err != nil {
 		response.Error(writer, http.StatusBadRequest, err)
+		return
+	}
+
+	db := database.GetDB()
+	repository := repositories.NewUserRepository(db)
+
+	if err = repository.Create(user); err != nil {
+		response.Error(writer, http.StatusInternalServerError, err)
 		return
 	}
 
@@ -39,11 +46,13 @@ func CreateUser(writer http.ResponseWriter, request *http.Request) {
 	})
 }
 
-func GetAllUsers(writer http.ResponseWriter, request *http.Request) {
+func List(writer http.ResponseWriter, request *http.Request) {
 	username := strings.ToLower(request.URL.Query().Get("user"))
-	repository := repositories.NewUserRepository()
 
-	users, err := repository.GetAllByUsername(username)
+	db := database.GetDB()
+	repository := repositories.NewUserRepository(db)
+
+	users, err := repository.List(username)
 	if err != nil {
 		response.Error(writer, http.StatusBadRequest, err)
 		return
@@ -52,46 +61,80 @@ func GetAllUsers(writer http.ResponseWriter, request *http.Request) {
 	response.JSON(writer, http.StatusOK, users)
 }
 
-func GetUser(writer http.ResponseWriter, request *http.Request) {
+func Get(writer http.ResponseWriter, request *http.Request) {
 	params := mux.Vars(request)
-	userId := params["userId"]
-	repository := repositories.NewUserRepository()
 
-	user, err := repository.GetUserById(userId)
+	userId, err := strconv.ParseUint(params["userId"], 10, 64)
 	if err != nil {
 		response.Error(writer, http.StatusBadRequest, err)
+		return
+	}
+
+	db := database.GetDB()
+	repository := repositories.NewUserRepository(db)
+
+	user, err := repository.Get(userId)
+	if err != nil {
+		response.Error(writer, http.StatusInternalServerError, err)
 		return
 	}
 
 	response.JSON(writer, http.StatusOK, user)
 }
 
-func UpdateUser(writer http.ResponseWriter, request *http.Request) {
+func Update(writer http.ResponseWriter, request *http.Request) {
 	params := mux.Vars(request)
-	userId := params["userId"]
 
-	requestBody, err := ioutil.ReadAll(request.Body)
+	userId, err := strconv.ParseUint(params["userId"], 10, 64)
+	if err != nil {
+		response.Error(writer, http.StatusBadRequest, err)
+		return
+	}
+
+	body, err := ioutil.ReadAll(request.Body)
 	if err != nil {
 		response.Error(writer, http.StatusUnprocessableEntity, err)
 		return
 	}
 
 	var user models.User
-	if err = json.Unmarshal(requestBody, &user); err != nil {
+	if err = json.Unmarshal(body, &user); err != nil {
 		response.Error(writer, http.StatusBadRequest, err)
 		return
 	}
 
-	repository := repositories.NewUserRepository()
-	err = repository.UpdateUser(userId, user)
-	if err != nil {
+	if err = user.Validate("update"); err != nil {
 		response.Error(writer, http.StatusBadRequest, err)
+		return
+	}
+
+	db := database.GetDB()
+	repository := repositories.NewUserRepository(db)
+
+	if err = repository.Update(userId, user); err != nil {
+		response.Error(writer, http.StatusInternalServerError, err)
 		return
 	}
 
 	response.JSON(writer, http.StatusNoContent, nil)
 }
 
-func DeleteUser(writer http.ResponseWriter, request *http.Request) {
-	writer.Write([]byte("Deleting a User"))
+func Delete(writer http.ResponseWriter, request *http.Request) {
+	params := mux.Vars(request)
+
+	userId, err := strconv.ParseUint(params["userId"], 10, 64)
+	if err != nil {
+		response.Error(writer, http.StatusBadRequest, err)
+		return
+	}
+
+	db := database.GetDB()
+	repository := repositories.NewUserRepository(db)
+
+	if err = repository.Delete(userId); err != nil {
+		response.Error(writer, http.StatusInternalServerError, err)
+		return
+	}
+
+	response.JSON(writer, http.StatusNoContent, nil)
 }

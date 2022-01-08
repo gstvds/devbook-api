@@ -10,11 +10,11 @@ import (
 )
 
 type database struct {
-	User         string `json:"db_user,omitempty"`
-	Password     string `json:"db_password,omitempty"`
-	Host         string `json:"db_host,omitempty"`
-	Name         string `json:"db_name,omitempty"`
-	InstanceName string `json:"instance_name,omitempty"`
+	User     string `json:"db_user,omitempty"`
+	Password string `json:"db_password,omitempty"`
+	Host     string `json:"db_host,omitempty"`
+	Name     string `json:"db_name,omitempty"`
+	Port     uint `json:"db_port,omitempty"`
 }
 
 var (

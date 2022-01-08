@@ -1,7 +1,7 @@
 package main
 
 import (
-	"api/src/repositories"
+	"api/src/database"
 	"api/src/router"
 	"api/src/utils/config"
 	"fmt"
@@ -9,16 +9,16 @@ import (
 	"net/http"
 )
 
-func main() {
-	config.LoadEnv()
-
-	router := router.Create()
+func listen() {
+	routes := router.Create()
 
 	fmt.Printf("Server running on PORT %d\n", config.PORT)
-	_, err := repositories.GetApp()
-	if err != nil {
-		log.Fatal(err)
-	}
+	log.Fatal(http.ListenAndServe(fmt.Sprintf(":%d", config.PORT), routes))
+}
 
-	log.Fatal(http.ListenAndServe(fmt.Sprintf(":%d", config.PORT), router))
+func main() {
+	config.LoadEnv()
+	database.Setup()
+
+	listen()
 }
