@@ -70,3 +70,12 @@ func (repository Users) Delete(userId uint64) error {
 
 	return err
 }
+
+// GetByEmail return a User from database by its email
+func (repository Users) GetByEmail(email string) (models.User, error) {
+	var user models.User
+
+	err := repository.db.Select("id", "email", "password").Where("email = ?", email).First(&user).Error
+
+	return user, err
+}
