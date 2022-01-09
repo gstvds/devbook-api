@@ -16,6 +16,7 @@ import (
 	"github.com/gorilla/mux"
 )
 
+// Create a new User
 func Create(writer http.ResponseWriter, request *http.Request) {
 	body, err := ioutil.ReadAll(request.Body)
 	if err != nil {
@@ -48,6 +49,7 @@ func Create(writer http.ResponseWriter, request *http.Request) {
 	})
 }
 
+// List all Users by username
 func List(writer http.ResponseWriter, request *http.Request) {
 	username := strings.ToLower(request.URL.Query().Get("user"))
 
@@ -63,6 +65,7 @@ func List(writer http.ResponseWriter, request *http.Request) {
 	response.JSON(writer, http.StatusOK, users)
 }
 
+// Get a User by userId
 func Get(writer http.ResponseWriter, request *http.Request) {
 	params := mux.Vars(request)
 
@@ -84,6 +87,7 @@ func Get(writer http.ResponseWriter, request *http.Request) {
 	response.JSON(writer, http.StatusOK, user)
 }
 
+// Update a User by userId
 func Update(writer http.ResponseWriter, request *http.Request) {
 	params := mux.Vars(request)
 
@@ -132,12 +136,24 @@ func Update(writer http.ResponseWriter, request *http.Request) {
 	response.JSON(writer, http.StatusNoContent, nil)
 }
 
+// Delete a User by userId
 func Delete(writer http.ResponseWriter, request *http.Request) {
 	params := mux.Vars(request)
 
 	userId, err := strconv.ParseUint(params["userId"], 10, 64)
 	if err != nil {
 		response.Error(writer, http.StatusBadRequest, err)
+		return
+	}
+
+	tokenUserId, err := authentication.ExtractUserId(request)
+	if err != nil {
+		response.Error(writer, http.StatusUnauthorized, err)
+		return
+	}
+
+	if userId != tokenUserId {
+		response.Error(writer, http.StatusForbidden, errors.New("you can not delete a user that is not yours"))
 		return
 	}
 
