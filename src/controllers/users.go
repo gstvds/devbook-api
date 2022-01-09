@@ -247,3 +247,23 @@ func Followers(writer http.ResponseWriter, request *http.Request) {
 
 	response.JSON(writer, http.StatusOK, followers)
 }
+
+// Following gets users a specific User is following
+func Following(writer http.ResponseWriter, request *http.Request) {
+	params := mux.Vars(request)
+	userId, err := strconv.ParseUint(params["userId"], 10, 64)
+	if err != nil {
+		response.Error(writer, http.StatusBadRequest, err)
+		return
+	}
+
+	db := database.GetDB()
+	repository := repositories.NewUserRepository(db)
+	followers, err := repository.GetFollowing(userId)
+	if err != nil {
+		response.Error(writer, http.StatusInternalServerError, err)
+		return
+	}
+
+	response.JSON(writer, http.StatusOK, followers)
+}

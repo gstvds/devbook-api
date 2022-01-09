@@ -99,10 +99,21 @@ func (repository Users) Unfollow(userId, followerId uint64) error {
 	return err
 }
 
+// GetFollowers gets all followers form a User
 func (repository Users) GetFollowers(userId uint64) ([]models.User, error) {
 	var user []models.User
 
 	err := repository.db.Joins("JOIN followers on users.id=followers.follower_id").Where("followers.user_id = ?", userId).Select("id", "username", "name", "email").Find(&user).Error
+
+	fmt.Println(user)
+	return user, err
+}
+
+// GetFollowing gets users a specific User is following
+func (repository Users) GetFollowing(userId uint64) ([]models.User, error) {
+	var user []models.User
+
+	err := repository.db.Joins("JOIN followers on users.id=followers.user_id").Where("followers.follower_id = ?", userId).Select("id", "username", "name", "email").Find(&user).Error
 
 	fmt.Println(user)
 	return user, err
