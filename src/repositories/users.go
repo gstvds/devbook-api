@@ -79,3 +79,13 @@ func (repository Users) GetByEmail(email string) (models.User, error) {
 
 	return user, err
 }
+
+// Follow a User
+func (repository Users) Follow(userId, followerId uint64) error {
+	var follower = models.Follower{UserId: userId, FollowerId: followerId}
+	if err := repository.db.Create(&follower).Error; err != nil {
+		return err
+	}
+
+	return nil
+}

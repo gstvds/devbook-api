@@ -29,7 +29,7 @@ func Setup() {
 		log.Fatal(err)
 	}
 
-	if err = openDB.AutoMigrate(&models.User{}); err != nil {
+	if err = openDB.AutoMigrate(&models.User{}, &models.Follower{}); err != nil {
 		fmt.Println("Failed to auto migrate User model")
 		log.Fatal(err)
 	}
