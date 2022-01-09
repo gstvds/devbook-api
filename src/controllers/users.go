@@ -17,8 +17,8 @@ import (
 	"github.com/gorilla/mux"
 )
 
-// Create a new User
-func Create(writer http.ResponseWriter, request *http.Request) {
+// CreateUser a new User
+func CreateUser(writer http.ResponseWriter, request *http.Request) {
 	body, err := ioutil.ReadAll(request.Body)
 	if err != nil {
 		response.Error(writer, http.StatusUnprocessableEntity, err)
@@ -50,8 +50,8 @@ func Create(writer http.ResponseWriter, request *http.Request) {
 	})
 }
 
-// List all Users by username
-func List(writer http.ResponseWriter, request *http.Request) {
+// ListUser all Users by username
+func ListUser(writer http.ResponseWriter, request *http.Request) {
 	username := strings.ToLower(request.URL.Query().Get("user"))
 
 	db := database.GetDB()
@@ -66,8 +66,8 @@ func List(writer http.ResponseWriter, request *http.Request) {
 	response.JSON(writer, http.StatusOK, users)
 }
 
-// Get a User by userId
-func Get(writer http.ResponseWriter, request *http.Request) {
+// GetUser a User by userId
+func GetUser(writer http.ResponseWriter, request *http.Request) {
 	params := mux.Vars(request)
 
 	userId, err := strconv.ParseUint(params["userId"], 10, 64)
@@ -88,8 +88,8 @@ func Get(writer http.ResponseWriter, request *http.Request) {
 	response.JSON(writer, http.StatusOK, user)
 }
 
-// Update a User by userId
-func Update(writer http.ResponseWriter, request *http.Request) {
+// UpdateUser a User by userId
+func UpdateUser(writer http.ResponseWriter, request *http.Request) {
 	params := mux.Vars(request)
 
 	userId, err := strconv.ParseUint(params["userId"], 10, 64)
@@ -137,8 +137,8 @@ func Update(writer http.ResponseWriter, request *http.Request) {
 	response.JSON(writer, http.StatusNoContent, nil)
 }
 
-// Delete a User by userId
-func Delete(writer http.ResponseWriter, request *http.Request) {
+// DeleteUser a User by userId
+func DeleteUser(writer http.ResponseWriter, request *http.Request) {
 	params := mux.Vars(request)
 
 	userId, err := strconv.ParseUint(params["userId"], 10, 64)
@@ -169,8 +169,8 @@ func Delete(writer http.ResponseWriter, request *http.Request) {
 	response.JSON(writer, http.StatusNoContent, nil)
 }
 
-// Follow allow a User to follow another
-func Follow(writer http.ResponseWriter, request *http.Request) {
+// FollowUser allow a User to follow another
+func FollowUser(writer http.ResponseWriter, request *http.Request) {
 	followerId, err := authentication.ExtractUserId(request)
 	if err != nil {
 		response.Error(writer, http.StatusUnauthorized, err)
@@ -200,8 +200,8 @@ func Follow(writer http.ResponseWriter, request *http.Request) {
 	response.JSON(writer, http.StatusNoContent, nil)
 }
 
-// Unfollow allow a User to unfollow another
-func Unfollow(writer http.ResponseWriter, request *http.Request) {
+// UnfollowUser allow a User to unfollow another
+func UnfollowUser(writer http.ResponseWriter, request *http.Request) {
 	followerId, err := authentication.ExtractUserId(request)
 	if err != nil {
 		response.Error(writer, http.StatusUnauthorized, err)
@@ -229,8 +229,8 @@ func Unfollow(writer http.ResponseWriter, request *http.Request) {
 	response.JSON(writer, http.StatusNoContent, nil)
 }
 
-// Followers gets all followers form a User
-func Followers(writer http.ResponseWriter, request *http.Request) {
+// GetFollowers gets all followers form a User
+func GetFollowers(writer http.ResponseWriter, request *http.Request) {
 	params := mux.Vars(request)
 	userId, err := strconv.ParseUint(params["userId"], 10, 64)
 	if err != nil {
@@ -249,8 +249,8 @@ func Followers(writer http.ResponseWriter, request *http.Request) {
 	response.JSON(writer, http.StatusOK, followers)
 }
 
-// Following gets users a specific User is following
-func Following(writer http.ResponseWriter, request *http.Request) {
+// GetFollowing gets users a specific User is following
+func GetFollowing(writer http.ResponseWriter, request *http.Request) {
 	params := mux.Vars(request)
 	userId, err := strconv.ParseUint(params["userId"], 10, 64)
 	if err != nil {

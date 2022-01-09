@@ -30,10 +30,16 @@ func Setup() {
 		log.Fatal(err)
 	}
 
-	if err = openDB.AutoMigrate(&models.User{}, &models.Follower{}); err != nil {
-		fmt.Println("Failed to auto migrate User model")
+	if err = openDB.Migrator().DropTable(&models.Post{}, &models.Follower{}, &models.User{}); err != nil {
+		fmt.Println("Failed to drop tables")
 		log.Fatal(err)
 	}
+
+	if err = openDB.AutoMigrate(&models.User{}, &models.Follower{}, &models.Post{}); err != nil {
+		fmt.Println("Failed to auto migrate User, Follower and Post models")
+		log.Fatal(err)
+	}
+
 
 	db = openDB
 }
