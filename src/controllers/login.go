@@ -9,7 +9,6 @@ import (
 	"api/src/utils/response"
 	"encoding/json"
 	"errors"
-	"fmt"
 	"io/ioutil"
 	"net/http"
 )
@@ -43,6 +42,12 @@ func Login(writer http.ResponseWriter, request *http.Request) {
 		return
 	}
 
-	token, _ := authentication.GenerateToken(databaseUser.Id)
-	fmt.Println(token)
+	token, err := authentication.GenerateToken(databaseUser.Id)
+	if err != nil {
+		response.Error(writer, http.StatusInternalServerError, err)
+		return
+	}
+
+
+	writer.Write([]byte(token))
 }

@@ -16,19 +16,19 @@ var userRoutes = []Route{
 		URI:           "/users",
 		Method:        http.MethodGet,
 		Exec:          controllers.List,
-		Authenticated: false,
+		Authenticated: true,
 	},
 	{
 		URI:           "/users/{userId}",
 		Method:        http.MethodGet,
 		Exec:          controllers.Get,
-		Authenticated: false,
+		Authenticated: true,
 	},
 	{
 		URI:           "/users/{userId}",
 		Method:        http.MethodPut,
 		Exec:          controllers.Update,
-		Authenticated: false,
+		Authenticated: true,
 	},
 	{
 		URI:           "/users/{userId}",
