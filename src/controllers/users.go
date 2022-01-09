@@ -168,6 +168,7 @@ func Delete(writer http.ResponseWriter, request *http.Request) {
 	response.JSON(writer, http.StatusNoContent, nil)
 }
 
+// Follow allow a User to follow another
 func Follow(writer http.ResponseWriter, request *http.Request) {
 	followerId, err := authentication.ExtractUserId(request)
 	if err != nil {
@@ -183,7 +184,7 @@ func Follow(writer http.ResponseWriter, request *http.Request) {
 	}
 
 	if followerId == userId {
-		response.Error(writer, http.StatusForbidden, errors.New("invalid operation. you can not follow yourself"))
+		response.Error(writer, http.StatusForbidden, errors.New("invalid operation. you can't follow yourself"))
 		return
 	}
 
@@ -196,4 +197,53 @@ func Follow(writer http.ResponseWriter, request *http.Request) {
 	}
 
 	response.JSON(writer, http.StatusNoContent, nil)
+}
+
+// Unfollow allow a User to unfollow another
+func Unfollow(writer http.ResponseWriter, request *http.Request) {
+	followerId, err := authentication.ExtractUserId(request)
+	if err != nil {
+		response.Error(writer, http.StatusUnauthorized, err)
+		return
+	}
+
+	params := mux.Vars(request)
+	userId, err := strconv.ParseUint(params["userId"], 10, 64)
+	if err != nil {
+		response.Error(writer, http.StatusBadRequest, err)
+		return
+	}
+
+	if followerId == userId {
+		response.Error(writer, http.StatusForbidden, errors.New("invalid operation. you can't unfollow yourself"))
+	}
+
+	db := database.GetDB()
+	repository := repositories.NewUserRepository(db)
+	if err = repository.Unfollow(userId, followerId); err != nil {
+		response.Error(writer, http.StatusInternalServerError, err)
+		return
+	}
+
+	response.JSON(writer, http.StatusNoContent, nil)
+}
+
+// Followers gets all followers form a User
+func Followers(writer http.ResponseWriter, request *http.Request) {
+	params := mux.Vars(request)
+	userId, err := strconv.ParseUint(params["userId"], 10, 64)
+	if err != nil {
+		response.Error(writer, http.StatusBadRequest, err)
+		return
+	}
+
+	db := database.GetDB()
+	repository := repositories.NewUserRepository(db)
+	followers, err := repository.GetFollowers(userId)
+	if err != nil {
+		response.Error(writer, http.StatusInternalServerError, err)
+		return
+	}
+
+	response.JSON(writer, http.StatusOK, followers)
 }

@@ -80,7 +80,7 @@ func (repository Users) GetByEmail(email string) (models.User, error) {
 	return user, err
 }
 
-// Follow a User
+// Follow allow a User to follow another
 func (repository Users) Follow(userId, followerId uint64) error {
 	var follower = models.Follower{UserId: userId, FollowerId: followerId}
 	if err := repository.db.Create(&follower).Error; err != nil {
@@ -88,4 +88,22 @@ func (repository Users) Follow(userId, followerId uint64) error {
 	}
 
 	return nil
+}
+
+// Unfollow allow a User to unfollow another
+func (repository Users) Unfollow(userId, followerId uint64) error {
+	var databaseFollower models.Follower
+	databaseFollower.FollowerId = followerId
+	err := repository.db.Delete(&databaseFollower, "user_id = ?", userId).Error
+
+	return err
+}
+
+func (repository Users) GetFollowers(userId uint64) ([]models.User, error) {
+	var user []models.User
+
+	err := repository.db.Joins("JOIN followers on users.id=followers.follower_id").Where("followers.user_id = ?", userId).Select("id", "username", "name", "email").Find(&user).Error
+
+	fmt.Println(user)
+	return user, err
 }
