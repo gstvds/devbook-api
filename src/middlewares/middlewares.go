@@ -7,6 +7,7 @@ import (
 	"net/http"
 )
 
+// Logger adds a initial log with the received method, URI and host
 func Logger(next http.HandlerFunc) http.HandlerFunc {
 	return func(writer http.ResponseWriter, request *http.Request) {
 		log.Printf("\n [%s] %s %s", request.Method, request.RequestURI, request.Host)

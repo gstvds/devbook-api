@@ -13,6 +13,7 @@ import (
 	"net/http"
 )
 
+// Login authenticate a User and returns a token
 func Login(writer http.ResponseWriter, request *http.Request) {
 	body, err := ioutil.ReadAll(request.Body)
 	if err != nil {
@@ -48,6 +49,5 @@ func Login(writer http.ResponseWriter, request *http.Request) {
 		return
 	}
 
-
-	writer.Write([]byte(token))
+	response.JSON(writer, http.StatusOK, map[string]string{"access_token": token})
 }

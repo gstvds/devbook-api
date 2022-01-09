@@ -118,3 +118,23 @@ func (repository Users) GetFollowing(userId uint64) ([]models.User, error) {
 	fmt.Println(user)
 	return user, err
 }
+
+// GetPassword gets a User password by its userId
+func (repository Users) GetPassword(userId uint64) (string, error) {
+	var user models.User
+	err := repository.db.Model(&models.User{}).Select("password").Where("id = ?", userId).Find(&user).Error
+
+	return user.Password, err
+}
+
+// UpdatePassword updates a User password
+func (repository Users) UpdatePassword(userId uint64, password string) error {
+	var databaseUser models.User
+	databaseUser.Id = userId
+
+	repository.db.First(&databaseUser)
+
+	databaseUser.Password = password
+
+	return repository.db.Save(&databaseUser).Error
+}

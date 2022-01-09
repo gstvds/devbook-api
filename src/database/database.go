@@ -11,6 +11,7 @@ import (
 
 var db *gorm.DB
 
+// Setup the database connection
 func Setup() {
 	var dsn = fmt.Sprintf("host=%s user=%s password=%s dbname=%s port=%d sslmode=disable",
 		config.DATABASE.Host,
@@ -37,6 +38,7 @@ func Setup() {
 	db = openDB
 }
 
+// GetDB retrieves the database
 func GetDB() *gorm.DB {
 	return db
 }

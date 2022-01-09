@@ -6,6 +6,7 @@ import (
 	"net/http"
 )
 
+// JSON sends a success response to the client
 func JSON(writer http.ResponseWriter, statusCode int, data interface{}) {
 	writer.Header().Set("Content-Type", "application/json")
 	writer.WriteHeader(statusCode)
@@ -17,6 +18,7 @@ func JSON(writer http.ResponseWriter, statusCode int, data interface{}) {
 	}
 }
 
+// Error sends a error response to the client
 func Error(writer http.ResponseWriter, statusCode int, err error) {
 	JSON(writer, statusCode, struct {
 		Error string `json:"error"`
